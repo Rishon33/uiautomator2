@@ -1,160 +1,97 @@
 # uiautomator2
 
-[📖 Read the English version](README.md)
-
 [![PyPI](https://img.shields.io/pypi/v/uiautomator2.svg)](https://pypi.python.org/pypi/uiautomator2)
 ![PyPI](https://img.shields.io/pypi/pyversions/uiautomator2.svg)
 [![codecov](https://codecov.io/gh/openatx/uiautomator2/graph/badge.svg?token=d0ZLkqorBu)](https://codecov.io/gh/openatx/uiautomator2)
 
+[📖 Read the English version](README.md)
 
-QQ交流群: **815453846**
-Discord: <https://discord.gg/PbJhnZJKDd>
+一个简单、好用、稳定的Android自动化的库
 
-> 有段时间没有维护这个项目了（可能有两年了），但是最近工作需要又重新研究一下Android原生自动化，当然又调研了Appium，对比下来一看，发现uiautomator2这个项目的运行速度是真的好快，从检测元素到点击，都是毫秒级的，代码也比较好理解。真是没想到以前竟然写出了这么神奇的项目，这么好的项目怎么能让它落灰呢，得好好整一整，一些垃圾代码清理清理。所以项目版本从2.x.x升级到了3.x.x
+## 工作原理
+本框架主要包含两个部分:
 
-还在用2.x.x版本的用户，可以先看一下[2to3](docs/2to3.md) 再决定是否要升级3.x.x （我个人还是非常建议升级的）
+1. 手机端: 运行一个基于UiAutomator的HTTP服务，提供Android自动化的各种接口
+2. Python客户端: 通过HTTP协议与手机端通信，调用UiAutomator的各种功能
 
-2到3毕竟是大版本升级，很多的函数删掉了。首先删掉的就是atx-agent，其次还有一堆atx-agent相关的函数。废弃的功能比如init.
+简单来说就是把Android自动化的能力通过HTTP接口的方式暴露给Python使用。这种设计使得Python端的代码编写更加简单直观。
 
-各种依赖库的版本号
+> 还在用2.x.x版本的用户，可以先看一下[2to3](docs/2to3.md) 再决定是否要升级3.x.x （强烈建议升级）
 
-- [![PyPI](https://img.shields.io/pypi/v/uiautomator2.svg?label=uiautomator2)](https://pypi.python.org/pypi/uiautomator2)
-- [![PyPI](https://img.shields.io/pypi/v/adbutils.svg?label=adbutils)](https://github.com/openatx/adbutils)
-- [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/openatx/android-uiautomator-server.svg?label=android-uiautomator-server)](https://github.com/openatx/android-uiautomator-server)
-- ~~[![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/openatx/atx-agent.svg?label=atx-agent)](https://github.com/openatx/atx-agent)~~
+## 交流群
 
-[UiAutomator](https://developer.android.com/training/testing/ui-automator.html)是Google提供的用来做安卓自动化测试的一个Java库，基于Accessibility服务。功能很强，可以对第三方App进行测试，获取屏幕上任意一个APP的任意一个控件属性，并对其进行任意操作，但有两个缺点：1. 测试脚本只能使用Java语言 2. 测试脚本要打包成jar或者apk包上传到设备上才能运行。
+- QQ交流群: 1群:815453846 2群:943964182
+- Discord: <https://discord.gg/PbJhnZJKDd>
 
-我们希望测试逻辑能够用Python编写，能够在电脑上运行的时候就控制手机。这里要非常感谢 Xiaocong He ([@xiaocong][])，他将这个想法实现了出来（见[xiaocong/uiautomator](https://github.com/xiaocong/uiautomator)），原理是在手机上运行了一个http rpc服务，将uiautomator中的功能开放出来，然后再将这些http接口封装成Python库。
-因为`xiaocong/uiautomator`这个库，已经很久不见更新。所以我们直接fork了一个版本，为了方便做区分我们就在后面加了个2 [openatx/uiautomator2](https://github.com/openatx/uiautomator2),对应的Android包源码我也fork了一份，[openatx/android-uiautomator-server](https://github.com/openatx/android-uiautomator-server)
-
-除了对原有的库的bug进行了修复，还增加了很多新的Feature。主要有以下部分：
-
-* ~~设备和开发机可以脱离数据线，通过WiFi互联（基于[atx-agent](https://github.com/openatx/atx-agent)~~
-* ~~集成了[openstf/minicap](https://github.com/openstf/minicap)达到实时屏幕投频，以及实时截图~~
-* ~~集成了[openstf/minitouch](https://github.com/openstf/minitouch)达到精确实时控制设备~~
-* 修复了[xiaocong/uiautomator](https://github.com/xiaocong/uiautomator)经常性退出的问题
-* 代码进行了重构和精简，方便维护
-* 实现了一个设备管理平台(也支持iOS) [atxserver2](https://github.com/openatx/atxserver2) （注：目前不怎么维护了）
-* 扩充了toast获取和展示的功能（需要手动开启ATX的悬浮窗权限） 貌似有bug用不了
-
->这里要先说明下，因为经常有很多人问 openatx/uiautomator2 并不支持iOS测试，需要iOS自动化测试，可以转到这个库 [openatx/facebook-wda](https://github.com/openatx/facebook-wda)。
-
-> PS: 这个库 ~~<https://github.com/NeteaseGame/ATX>~~ 目前已经不维护了，请尽快更换。
-
-这里有一份快速参考，适合已经入门的人 [QUICK REFERENCE GUIDE](QUICK_REFERENCE.md)，欢迎多提意见。
-
-## Requirements
+# 依赖
 - Android版本 4.4+
 - Python 3.8+
 
-## QUICK START
-先准备一台（不要两台）开启了`开发者选项`的安卓手机，连接上电脑，确保执行`adb devices`可以看到连接上的设备。
+# 安装
 
-运行`pip3 install -U uiautomator2` 安装uiautomator2
+```sh
+pip install uiautomator2
 
-命令行运行`python`打开python交互窗口。然后将下面的命令输入到窗口中。
+# 检查是否安装成功，正常情况下会输出库的版本好
+uiautomator2 version
+# or: python -m uiautomator2 version
+```
+
+安装元素查看工具（可选，但是强烈推荐）
+
+> 更详细的使用说明参考: https://github.com/codeskyblue/uiautodev QQ:536481989
+
+
+```sh
+pip install uiautodev
+
+# 命令行启动后会自动打开浏览器
+uiautodev
+# or: python -m uiautodev
+```
+
+代替品: uiautomatorviewer, Appium Inspector
+
+# 快速入门
+
+准备一台开启了`开发者选项`的安卓手机，连接上电脑，确保执行`adb devices`可以看到连接上的设备。
+
+打开python交互窗口。然后将下面的命令输入到窗口中。
 
 ```python
 import uiautomator2 as u2
 
-d = u2.connect() # connect to device
+d = u2.connect() # 连接多台设备需要指定设备序列号
 print(d.info)
+# 期望输出
+# {'currentPackageName': 'net.oneplus.launcher', 'displayHeight': 1920, 'displayRotation': 0, 'displaySizeDpX': 411, 'displaySizeDpY': 731, 'displayWidth': 1080, 'productName': 'OnePlus5', 'screenOn': True, 'sdkInt': 27, 'naturalOrientation': True}
 ```
 
-这时看到类似下面的输出，就可以正式开始用我们这个库了。因为这个库功能太多，后面还有很多的内容，需要慢慢去看 ....
+脚本例子
 
+```python
+import uiautomator2 as u2
+
+d = u2.connect('Q5S5T19611004599')
+d.app_start('tv.danmaku.bili', stop=True) # 启动Bilibili
+d.wait_activity('.MainActivityV2')
+d.sleep(5) # 等待开屏广告消失
+d.xpath('//*[@text="我的"]').click()
+# 获取粉丝数量
+fans_count = d.xpath('//*[@resource-id="tv.danmaku.bili:id/fans_count"]').text
+print(f"粉丝数量: {fans_count}")
 ```
-{'currentPackageName': 'net.oneplus.launcher', 'displayHeight': 1920, 'displayRotation': 0, 'displaySizeDpX': 411, 'displaySizeDpY': 731, 'displayWidth': 1080, 'productName': 'OnePlus5', '
-screenOn': True, 'sdkInt': 27, 'naturalOrientation': True}
-```
 
-另外为了保持稳定，还需要开启`小黄车`的悬浮窗权限。参考文章 [py-uiautomator2通过悬浮窗让服务长时间可用](https://zhuanlan.zhihu.com/p/688009468)
+# 使用文档
 
-一般情况下都会成功，不过也可能会有意外。可以加QQ群反馈问题(群号在最上面），群里有很多大佬可以帮你解决问题。
+## 连接设备
 
-# Article Recommended
-优秀文章推荐 (欢迎QQ群里at我反馈）
-
-- [termux里如何部署uiautomator2简介](https://www.cnblogs.com/ze-yan/p/12242383.html) by `成都-测试只会一点点`
-
-## 相关项目
-- 基于adb协议与Android进行交互的库 [adbutils](https://github.com/openatx/adbutils)
-- [uiauto.dev](https://uiauto.dev) 用于查看UI层级结构，类似于uiautomatorviewer(用于替代之前写的weditor），用于查看UI层级结构 
-- 设备管理平台，设备多了就会用到 [atxserver2](https://github.com/openatx/atxserver2) （寻找项目维护人员）
-- ~~[atx-agent](https://github.com/openatx/atx-agent) 运行在设备上的驻守程序，go开发，用于保活设备上相关的服务~~
-- ~~[weditor](https://github.com/openatx/weditor) 类似于uiautomatorviewer，专门为本项目开发的辅助编辑器(这个暂不维护了~~
-
-**[Installation](#installation)**
-
-**[Connect to a device](#connect-to-a-device)**
-
-**[Command line](#command-line)**
-
-**[Global settings](#global-settings)**
-  - **[Debug HTTP requests](#debug-http-requests)**
-  - **[Implicit wait](#implicit-wait)**
-
-**[App management](#app-management)**
-  - **[Install an app](#install-an-app)**
-  - **[Launch an app](#launch-an-app)**
-  - **[Stop an app](#stop-an-app)**
-  - **[Stop all running apps](#stop-all-running-apps)**
-  - **[Push and pull files](#push-and-pull-files)**
-  - **[Other app operations](#other-app-operations)**
-
-**[UI automation](#basic-api-usages)**
-  - **[Shell commands](#shell-commands)**
-  - **[Session](#session)**
-  - **[Retrieve the device info](#retrieve-the-device-info)**
-  - **[Key Events](#key-events)**
-  - **[Gesture interaction with the device](#gesture-interaction-with-the-device)**
-  - **[Screen-related](#screen-related)**
-  - **[Selector](#selector)**
-  - **[Watcher](#watcher)**
-  - **[Global settings](#global-settings)**
-  - **[Input method](#input-method)**
-  - **[Toast](#toast)**
-  - **[XPath](#xpath)**
-  - **[Screenrecord](#screenrecord)**
-  - **[Image match](#image-match) Removed**
-
-
-**[Contributors](#contributors)**
-
-**[LICENSE](#license)**
-
-
-# Installation
-1. Install uiautomator2
-
-    ```bash
-    pip install -U uiautomator2
-    ```
-    
-    测试是否安装成功 `uiautomator2 --help`
-    
-2. UI Inspector
-
-    ```bash
-    pip install uiautodev
-    # 启动
-    uiauto.dev
-    ```
-
-    浏览器打开 https://uiauto.dev 查看当前设备的界面结构。
-
-    **uiauto.dev**
-
-    [uiauto.dev](https://github.com/codeskyblue/uiauto.dev) 是一个独立与uiautomator2之外的一个项目，用于查看图层结构的。属于旧版项目[weditor的重构版本](https://github.com/openatx/weditor)，后续也许会收费（价格肯定物超所值），来支持当前这个项目继续维护下去。感兴趣的可以加群讨论(也包含提需求) QQ群 536481989
-
-# Connect to a device
 方法1: 使用设备序列号链接设备 例如序列号. `Q5S5T19611004599` (seen from `adb devices`)
 
 ```python
 import uiautomator2 as u2
 
-d = u2.connect('123456f') # alias for u2.connect_usb('123456f')
+d = u2.connect('Q5S5T19611004599') # alias for u2.connect_usb('123456f')
 print(d.info)
 ```
 
@@ -162,7 +99,7 @@ print(d.info)
 
 
 ```python
-# export ANDROID_SERIAL=123456f
+# export ANDROID_SERIAL=Q5S5T19611004599
 d = u2.connect()
 ```
 
@@ -185,309 +122,79 @@ dev = adbutils.device(transport_id=6)
 d = u2.connect(dev)
 ```
 
+## 通过XPath操作元素
 
-# Command line
-其中的`$device_ip`代表设备的ip地址
+什么是XPath：
 
-如需指定设备需要传入`--serial` 如 `python3 -m uiautomator2 --serial bff1234 <SubCommand>`, SubCommand为子命令（screenshot, current 等）
+XPath 是一种在 XML 或 HTML 文档中定位内容的查询语言。它使用简单的语法规则建立从根节点到所需元素的路径。
 
-> 1.0.3 Added: `python3 -m uiautomator2` equals to `uiautomator2`
+基本语法：
+- `/` - 从根节点开始选择
+- `//` - 从当前节点开始选择任意位置
+- `.` - 选择当前节点 
+- `..` - 选择当前节点的父节点
+- `@` - 选择属性
+- `[]` - 谓语表达式，用于过滤条件
 
-- screenshot: 截图
+通过[UIAutoDev](https://uiauto.dev)可以快速的生成XPath
 
-    ```bash
-    $ uiautomator2 screenshot screenshot.jpg
-    ```
-
-- current: 获取当前包名和activity
-
-    ```bash
-    $ uiautomator2 current
-    {
-        "package": "com.android.browser",
-        "activity": "com.uc.browser.InnerUCMobile",
-        "pid": 28478
-    }
-    ```
-    
-- uninstall： Uninstall app
-
-    ```bash
-    $ uiautomator2 uninstall <package-name> # 卸载一个包
-    $ uiautomator2 uninstall <package-name-1> <package-name-2> # 卸载多个包
-    $ uiautomator2 uninstall --all # 全部卸载
-    ```
-
-- stop: Stop app
-
-    ```bash
-    $ uiautomator2 stop com.example.app # 停止一个app
-    $ uiautomator2 stop --all # 停止所有的app
-    ```
-
-- doctor:
-
-    ```bash
-    $ uiautomator2 doctor
-    [I 2024-04-25 19:53:36,288 __main__:101 pid:15596] uiautomator2 is OK
-    ```
-    
-# API Documents
-
-### New command timeout （Removed)
-When python quit, the UiAutomation service also quit.
-<!-- How long (in seconds) will wait for a new command from the client before assuming the client quit and ending the uiautomator service （Default 3 minutes）
-
-配置accessibility服务的最大空闲时间，超时将自动释放。默认3分钟。
+常用用法
 
 ```python
-d.set_new_command_timeout(300) # change to 5 minutes, unit seconds
-``` -->
+d.xpath('//*[@text="私人FM"]').click()
 
-### Debug HTTP requests
-打印出代码背后的HTTP请求信息
+# 语法糖
+d.xpath('@personal-fm') # 等价于 d.xpath('//*[@resource-id="personal-fm"]')
 
-```python
->>> d.debug = True
->>> d.info
-12:32:47.182 $ curl -X POST -d '{"jsonrpc": "2.0", "id": "b80d3a488580be1f3e9cb3e926175310", "method": "deviceInfo", "params": {}}' 'http://127.0.0.1:54179/jsonrpc/0'
-12:32:47.225 Response >>>
-{"jsonrpc":"2.0","id":"b80d3a488580be1f3e9cb3e926175310","result":{"currentPackageName":"com.android.mms","displayHeight":1920,"displayRotation":0,"displaySizeDpX":360,"displaySizeDpY":640,"displayWidth":1080,"productName"
-:"odin","screenOn":true,"sdkInt":25,"naturalOrientation":true}}
-<<< END
+sl = d.xpath("@com.example:id/home_searchedit") # sl为XPathSelector对象
+sl.click()
+sl.click(timeout=10) # 指定超时时间, 找不到抛出异常 XPathElementNotFoundError
+sl.click_exists() # 存在即点击，返回是否点击成功
+sl.click_exists(timeout=10) # 等待最多10s钟
+
+# 等到对应的元素出现，返回XMLElement
+# 默认的等待时间是10s
+el = sl.wait()
+el = sl.wait(timeout=15) # 等待15s, 没有找到会返回None
+
+# 等待元素消失
+sl.wait_gone()
+sl.wait_gone(timeout=15) 
+
+# 跟wait用法类似，区别是如果没找到直接抛出 XPathElementNotFoundError 异常
+el = sl.get() 
+el = sl.get(timeout=15)
+
+sl.get_text() # 获取组件名
+sl.set_text("") # 清空输入框
+sl.set_text("hello world") # 输入框输入 hello world
 ```
 
-### Implicit wait
+更多用法参考 [XPath接口文档](XPATH_CN.md)
+
+## 通过UiAutomator接口操作元素
+
+### 元素等待时长
 设置元素查找等待时间（默认20s）
 
 ```python
 d.implicitly_wait(10.0) # 也可以通过d.settings['wait_timeout'] = 10.0 修改
-d(text="Settings").click() # if Settings button not show in 10s, UiObjectNotFoundError will raised
-
 print("wait timeout", d.implicitly_wait()) # get default implicit wait
+
+# 如果Settings 10s没有出现就抛出异常 UiObjectNotFoundError
+d(text="Settings").click() 
 ```
 
-This function will have influence on `click`, `long_click`, `drag_to`, `get_text`, `set_text`, `clear_text`, etc.
+等待时长影响如下函数 `click`, `long_click`, `drag_to`, `get_text`, `set_text`, `clear_text`
+ 
 
-## App management
-This part showcases how to perform app management
+### 获取设备信息
 
-### Install an app
-We only support installing an APK from a URL
-
-```python
-d.app_install('http://some-domain.com/some.apk')
-```
-
-### Launch an app
-```python
-# 默认的这种方法是先通过atx-agent解析apk包的mainActivity，然后调用am start -n $package/$activity启动
-d.app_start("com.example.hello_world")
-
-# 使用 monkey -p com.example.hello_world -c android.intent.category.LAUNCHER 1 启动
-# 这种方法有个副作用，它自动会将手机的旋转锁定给关掉
-d.app_start("com.example.hello_world", use_monkey=True) # start with package name
-
-# 通过指定main activity的方式启动应用，等价于调用am start -n com.example.hello_world/.MainActivity
-d.app_start("com.example.hello_world", ".MainActivity")
-```
-
-### Stop an app
-```python
-# equivalent to `am force-stop`, thus you could lose data
-d.app_stop("com.example.hello_world") 
-# equivalent to `pm clear`
-d.app_clear('com.example.hello_world')
-```
-
-### Stop all running apps
-```python
-# stop all
-d.app_stop_all()
-# stop all app except for com.examples.demo
-d.app_stop_all(excludes=['com.examples.demo'])
-```
-
-### Get app info
-```python
-d.app_info("com.examples.demo")
-# expect output
-#{
-#    "mainActivity": "com.github.uiautomator.MainActivity",
-#    "label": "ATX",
-#    "versionName": "1.1.7",
-#    "versionCode": 1001007,
-#    "size":1760809
-#}
-
-# save app icon
-img = d.app_icon("com.examples.demo")
-img.save("icon.png")
-```
-
-### List all running apps
-```python
-d.app_list_running()
-# expect output
-# ["com.xxxx.xxxx", "com.github.uiautomator", "xxxx"]
-```
-
-### Wait until app running
-```python
-pid = d.app_wait("com.example.android") # 等待应用运行, return pid(int)
-if not pid:
-    print("com.example.android is not running")
-else:
-    print("com.example.android pid is %d" % pid)
-
-d.app_wait("com.example.android", front=True) # 等待应用前台运行
-d.app_wait("com.example.android", timeout=20.0) # 最长等待时间20s（默认）
-```
-
-> Added in version 1.2.0
-
-### Push and pull files
-* push a file to the device
-
-    ```python
-    # push to a folder
-    d.push("foo.txt", "/sdcard/")
-    # push and rename
-    d.push("foo.txt", "/sdcard/bar.txt")
-    # push fileobj
-    with open("foo.txt", 'rb') as f:
-        d.push(f, "/sdcard/")
-    # push and change file access mode
-    d.push("foo.sh", "/data/local/tmp/", mode=0o755)
-    ```
-
-* pull a file from the device
-
-    ```python
-    d.pull("/sdcard/tmp.txt", "tmp.txt")
-
-    # FileNotFoundError will raise if the file is not found on the device
-    d.pull("/sdcard/some-file-not-exists.txt", "tmp.txt")
-    ```
-
-### Other app operations
-
-```python
-# grant all the permissions
-d.app_auto_grant_permissions("io.appium.android.apis")
-
-# open scheme
-d.open_url("appname://appnamehost")
-# same as
-# adb shell am start -a android.intent.action.VIEW -d "appname://appnamehost"
-```
-
-## Basic API Usages
-This part showcases how to perform common device operations:
-
-### Shell commands
-* Run a short-lived shell command with a timeout protection. (Default timeout 60s)
-
-    Note: timeout support require `atx-agent >=0.3.3`
-
-    `adb_shell` function is deprecated. Use `shell` instead.
-
-    Simple usage
-
-    ```python
-    output, exit_code = d.shell("pwd", timeout=60) # timeout 60s (Default)
-    # output: "/\n", exit_code: 0
-    # Similar to command: adb shell pwd
-
-    # Since `shell` function return type is `namedtuple("ShellResponse", ("output", "exit_code"))`
-    # so we can do some tricks
-    output = d.shell("pwd").output
-    exit_code = d.shell("pwd").exit_code
-    ```
-
-    The first argument can be list. for example
-
-    ```python
-    output, exit_code = d.shell(["ls", "-l"])
-    # output: "/....", exit_code: 0
-    ```
-
-   This returns a string for stdout merged with stderr.
-   If the command is a blocking command, `shell` will also block until the command is completed or the timeout kicks in. No partial output will be received during the execution of the command. This API is not suitable for long-running commands. The shell command given runs in a similar environment of `adb shell`, which has a Linux permission level of `adb` or `shell` (higher than an app permission).
-
-* Run a long-running shell command (Removed)
-<!-- 
-    add stream=True will return `requests.models.Response` object. More info see [requests stream](http://docs.python-requests.org/zh_CN/latest/user/quickstart.html#id5)
-
-    ```python
-    r = d.shell("logcat", stream=True)
-    # r: requests.models.Response
-    deadline = time.time() + 10 # run maxium 10s
-    try:
-        for line in r.iter_lines(): # r.iter_lines(chunk_size=512, decode_unicode=None, delimiter=None)
-            if time.time() > deadline:
-                break
-            print("Read:", line.decode('utf-8'))
-    finally:
-        r.close() # this method must be called
-    ```
-
-    Command will be terminated when `r.close()` called. -->
-    
-### Session
-Session represent an app lifecycle. Can be used to start app, detect app crash.
-
-* Launch and close app
-
-    ```python
-    sess = d.session("com.netease.cloudmusic") # start 网易云音乐
-    sess.close() # 停止网易云音乐
-    sess.restart() # 冷启动网易云音乐
-    ```
-
-* Use python `with` to launch and close app
-
-    ```python
-    with d.session("com.netease.cloudmusic") as sess:
-        sess(text="Play").click()
-    ```
-
-* Attach to the running app
-
-    ```python
-    # launch app if not running, skip launch if already running
-    sess = d.session("com.netease.cloudmusic", attach=True)
-    ```
-
-* Detect app crash
-
-    ```python
-    # When app is still running
-    sess(text="Music").click() # operation goes normal
-
-    # If app crash or quit
-    sess(text="Music").click() # raise SessionBrokenError
-    # other function calls under session will raise SessionBrokenError too
-    ```
-
-    ```python
-    # check if session is ok.
-    # Warning: function name may change in the future
-    sess.running() # True or False
-    ```
-
-
-### Retrieve the device info
-
-Get basic information
+通过UiAutomator获取到的信息
 
 ```python
 d.info
-```
-
-Below is a possible output:
-
-```
+# Output
 {'currentPackageName': 'com.android.systemui',
  'displayHeight': 1560,
  'displayRotation': 0,
@@ -500,56 +207,11 @@ Below is a possible output:
  'sdkInt': 29}
 ```
 
-Get window size
-
-```python
-print(d.window_size())
-# device upright output example: (1080, 1920)
-# device horizontal output example: (1920, 1080)
-```
-
-Get current app info. For some android devices, the output could be empty (see *Output example 3*)
-
-```python
-print(d.app_current())
-# Output example 1: {'activity': '.Client', 'package': 'com.netease.example', 'pid': 23710}
-# Output example 2: {'activity': '.Client', 'package': 'com.netease.example'}
-# Output example 3: {'activity': None, 'package': None}
-```
-
-Wait activity
-
-```python
-d.wait_activity(".ApiDemos", timeout=10) # default timeout 10.0 seconds
-# Output: true of false
-```
-
-Get device serial number
-
-```python
-print(d.serial)
-# output example: 74aAEDR428Z9
-```
-
-Get WLAN ip
-
-```python
-print(d.wlan_ip)
-# output example: 10.0.0.1 or None
-```
-
-
-~~Get detailed device info~~ `d.device_info`
-
-device_info
+获取设备信息（基于adb shell getprop命令）
 
 ```python
 print(d.device_info)
-```
-
-Below is a possible output:
-
-```
+# output
 {'arch': 'arm64-v8a',
  'brand': 'google',
  'model': 'sdk_gphone64_arm64',
@@ -558,27 +220,58 @@ Below is a possible output:
  'version': 14}
 ```
 
-### Clipboard
-Get of set clipboard content
+获取屏幕物理尺寸 （依赖adb shell wm size)
 
+```python
+print(d.window_size())
+# device upright output example: (1080, 1920)
+# device horizontal output example: (1920, 1080)
+```
+
+获取当前App (依赖adb shell)
+
+```python
+print(d.app_current())
+# Output example 1: {'activity': '.Client', 'package': 'com.netease.example', 'pid': 23710}
+# Output example 2: {'activity': '.Client', 'package': 'com.netease.example'}
+# Output example 3: {'activity': None, 'package': None}
+```
+
+等待Activity （依赖adb shell）
+
+```python
+d.wait_activity(".ApiDemos", timeout=10) # default timeout 10.0 seconds
+# Output: true of false
+```
+
+获取设备序列号
+
+```python
+print(d.serial)
+# output example: 74aAEDR428Z9
+```
+
+获取设备WLAN IP (依赖adb shell)
+
+```python
+print(d.wlan_ip)
+# output example: 10.0.0.1 or None
+```
+
+### 剪贴板
 设置粘贴板内容或获取内容
 
 * clipboard/set_clipboard
 
     ```python
+    # 设置剪贴板
     d.clipboard = 'hello-world'
     # or
     d.set_clipboard('hello-world', 'label')
 
-    ```
-
-Get clipboard content
-
->  get clipboard requires IME(com.github.uiautomator/.AdbKeyboard) call `d.set_input_ime()` before using it.
-
-    ```python
-    
-    # get clipboard content
+    # 获取剪贴板
+    # 依赖输入法(com.github.uiautomator/.AdbKeyboard)
+    d.set_input_ime()
     print(d.clipboard)
     ```
 
@@ -594,7 +287,7 @@ Get clipboard content
 * Get current screen status
 
     ```python
-    d.info.get('screenOn') # require Android >= 4.4
+    d.info.get('screenOn')
     ```
 
 * Press hard/soft key
@@ -715,7 +408,7 @@ Note: click, swipe, drag operations support percentage position values. Example:
 
 `d.long_click(0.5, 0.5)` means long click center of screen
 
-### Screen-related
+### 屏幕相关接口
 * Retrieve/Set device orientation
 
     The possible orientations:
@@ -1119,7 +812,40 @@ Selector supports below parameters. Refer to [UiSelector Java doc](http://develo
   d(scrollable=True).scroll.to(text="Security")
   ```
 
-### WatchContext
+### 输入法
+
+> 输入法APK: https://github.com/openatx/android-uiautomator-server/releases
+
+```python
+d.send_keys("你好123abcEFG")
+d.send_keys("你好123abcEFG", clear=True)
+
+d.clear_text() # 清除输入框所有内容
+
+d.send_action() # 根据输入框的需求，自动执行回车、搜索等指令, Added in version 3.1
+# 也可以指定发送的输入法action, eg: d.send_action("search") 支持 go, search, send, next, done, previous
+
+d.hide_keyboard() # 隐藏输入法
+```
+
+输入法send_keys的时候，优先使用剪贴板进行输入。如果剪贴板接口无法使用，会安装辅助输入法进行输入。
+
+
+```python
+print(d.current_ime()) # 获取当前输入法ID
+```
+
+> 更多参考: [IME_ACTION_CODE](https://developer.android.com/reference/android/view/inputmethod/EditorInfo)
+
+### Toast
+```python
+print(d.last_toast) # get last toast, if not toast return None
+d.clear_toast()
+```
+
+### WatchContext (废弃)
+注: 这里不是很推荐用这个接口，最好点击元素前检查一下是否有弹窗
+
 目前的这个watch_context是用threading启动的，每2s检查一次
 目前还只有click这一种触发操作
 
@@ -1165,66 +891,7 @@ ctx.wait_stable() # 等待界面不在有弹窗了
 ctx.close()
 ```
 
-### Watcher
-**更推荐用WatchContext** 写法更简洁一些
-
-~~You can register [watchers](http://developer.android.com/tools/help/uiautomator/UiWatcher.html) to perform some actions when a selector does not find a match.~~
-
-2.0.0之前使用的是 uiautomator-jar库中提供的[Watcher]((http://developer.android.com/tools/help/uiautomator/UiWatcher.html)方法，但在实践中发现一旦uiautomator连接失败重启了，所有的watcher配置都是丢失，这肯定是无法接受的。
-
-所以目前采用了后台运行了一个线程的方法(依赖threading库），然后每隔一段时间dump一次hierarchy，匹配到元素之后执行相应的操作。
-
-用法举例
-
-注册监控
-
-```python
-# 常用写法，注册匿名监控
-d.watcher.when("安装").click()
-
-# 注册名为ANR的监控，当出现ANR和Force Close时，点击Force Close
-d.watcher("ANR").when(xpath="ANR").when("Force Close").click()
-
-# 其他回调例子
-d.watcher.when("抢红包").press("back")
-d.watcher.when("//*[@text = 'Out of memory']").call(lambda d: d.shell('am force-stop com.im.qq'))
-
-# 回调说明
-def click_callback(d: u2.Device):
-    d.xpath("确定").click() # 在回调中调用不会再次触发watcher
-
-d.xpath("继续").click() # 使用d.xpath检查元素的时候，会触发watcher（目前最多触发5次）
-
-# 开始后台监控
-d.watcher.start()
-```
-
-监控操作
-
-```python
-# 移除ANR的监控
-d.watcher.remove("ANR")
-
-# 移除所有的监控
-d.watcher.remove()
-
-# 开始后台监控
-d.watcher.start()
-d.watcher.start(2.0) # 默认监控间隔2.0s
-
-# 强制运行所有监控
-d.watcher.run()
-
-# 停止监控
-d.watcher.stop()
-
-# 停止并移除所有的监控，常用于初始化
-d.watcher.reset()
-```
-
-另外文档还是有很多没有写，推荐直接去看源码[watcher.py](uiautomator2/watcher.py)
-
-### Global settings
+### 全局设置
 
 ```python
 u2.HTTP_TIMEOUT = 60 # 默认值60s, http默认请求超时时间
@@ -1256,16 +923,6 @@ d.settings['max_depth'] = 50 # 默认50，限制dump_hierarchy返回的元素层
 [W 200514 14:55:59 settings:72] d.settings[click_before_delay] deprecated: Use operation_delay instead
 ```
 
-**uiautomator恢复方式设置**
-
-细心的你可能发现，实际上手机安装了两个APK，一个在前台可见（小黄车）。一个包名为`com.github.uiautomator.test`在后台不可见。这两个apk使用同一个证书签名的。
-不可见的应用实际上是一个测试包，包含有所有的测试代码，核心的测试服务也是通过其启动的。
-但是运行的时候，系统却需要那个小黄车一直在运行（在后台运行也可以）。一旦小黄车应用被杀，后台运行的测试服务也很快的会被杀掉。就算什么也不做，应用应用在后台，也会很快被系统回收掉。（这里希望高手指点一下，如何才能不依赖小黄车应用，感觉理论上是可以的，但是目前我还不会）。
-
-~~让小黄车在后台运行有两种方式，一种启动应用后，放到后台（默认）。另外通过`am startservice`启动一个后台服务也行。~~
-
-~~通过 `d.settings["uiautomator_runtest_app_background"] = True` 可以调整该行为。True代表启动应用，False代表启动服务。~~
-
 UiAutomator中的超时设置(隐藏方法)
 
 ```python
@@ -1288,109 +945,183 @@ UiAutomator中的超时设置(隐藏方法)
 
 Refs: [Google uiautomator Configurator](https://developer.android.com/reference/android/support/test/uiautomator/Configurator)
 
-### Input method
-这种方法通常用于不知道控件的情况下的输入。
+## 应用管理
+This part showcases how to perform app management
+
+### 安装应用
+We only support installing an APK from a URL
 
 ```python
-# 目前采用从剪贴板粘贴的方式输入
-d.send_keys("你好123abcEFG")
-d.send_keys("你好123abcEFG", clear=True)
-
-d.clear_text() # 清除输入框所有内容
-
-d.send_action() # 根据输入框的需求，自动执行回车、搜索等指令, Added in version 3.1
-# 也可以指定发送的输入法action, eg: d.send_action("search") 支持 go, search, send, next, done, previous
+d.app_install('http://some-domain.com/some.apk')
 ```
 
+### 启动应用
+```python
+# 默认的这种方法是先通过atx-agent解析apk包的mainActivity，然后调用am start -n $package/$activity启动
+d.app_start("com.example.hello_world")
 
+# 使用 monkey -p com.example.hello_world -c android.intent.category.LAUNCHER 1 启动
+# 这种方法有个副作用，它自动会将手机的旋转锁定给关掉
+d.app_start("com.example.hello_world", use_monkey=True) # start with package name
+
+# 通过指定main activity的方式启动应用，等价于调用am start -n com.example.hello_world/.MainActivity
+d.app_start("com.example.hello_world", ".MainActivity")
+```
+
+### 停止应用
 
 ```python
-print(d.current_ime()) # 获取当前输入法ID
-
+# equivalent to `am force-stop`, thus you could lose data
+d.app_stop("com.example.hello_world") 
+# equivalent to `pm clear`
+d.app_clear('com.example.hello_world')
 ```
 
-> 更多参考: [IME_ACTION_CODE](https://developer.android.com/reference/android/view/inputmethod/EditorInfo)
-
-### Toast
+### 停止所有应用
 ```python
-print(d.last_toast) # get last toast, if not toast return None
-d.clear_toast()
+# stop all
+d.app_stop_all()
+# stop all app except for com.examples.demo
+d.app_stop_all(excludes=['com.examples.demo'])
 ```
 
-> Fixed in version 3.2.0
+### 获取应用信息
+```python
+d.app_info("com.examples.demo")
+# expect output
+#{
+#    "mainActivity": "com.github.uiautomator.MainActivity",
+#    "label": "ATX",
+#    "versionName": "1.1.7",
+#    "versionCode": 1001007,
+#    "size":1760809
+#}
 
-### XPath
-Java uiautoamtor中默认是不支持xpath的，所以这里属于扩展的一个功能。速度不是这么的快。
-
-For example: 其中一个节点的内容
-
-```xml
-<android.widget.TextView
-  index="2"
-  text="05:19"
-  resource-id="com.netease.cloudmusic:id/qf"
-  package="com.netease.cloudmusic"
-  content-desc=""
-  checkable="false" checked="false" clickable="false" enabled="true" focusable="false" focused="false"
-  scrollable="false" long-clickable="false" password="false" selected="false" visible-to-user="true"
-  bounds="[957,1602][1020,1636]" />
+# save app icon
+img = d.app_icon("com.examples.demo")
+img.save("icon.png")
 ```
 
-xpath定位和使用方法
-
-有些属性的名字有修改需要注意
-
-```
-description -> content-desc
-resourceId -> resource-id
+### 列出所有运行的应用
+```python
+d.app_list_running()
+# expect output
+# ["com.xxxx.xxxx", "com.github.uiautomator", "xxxx"]
 ```
 
-常见用法
+### 等待应用运行
+```python
+pid = d.app_wait("com.example.android") # 等待应用运行, return pid(int)
+if not pid:
+    print("com.example.android is not running")
+else:
+    print("com.example.android pid is %d" % pid)
+
+d.app_wait("com.example.android", front=True) # 等待应用前台运行
+d.app_wait("com.example.android", timeout=20.0) # 最长等待时间20s（默认）
+```
+
+### 拉取和推送文件
+* push a file to the device
+
+    ```python
+    # push to a folder
+    d.push("foo.txt", "/sdcard/")
+    # push and rename
+    d.push("foo.txt", "/sdcard/bar.txt")
+    # push fileobj
+    with open("foo.txt", 'rb') as f:
+        d.push(f, "/sdcard/")
+    # push and change file access mode
+    d.push("foo.sh", "/data/local/tmp/", mode=0o755)
+    ```
+
+* pull a file from the device
+
+    ```python
+    d.pull("/sdcard/tmp.txt", "tmp.txt")
+
+    # FileNotFoundError will raise if the file is not found on the device
+    d.pull("/sdcard/some-file-not-exists.txt", "tmp.txt")
+    ```
+
+### 其他应用操作
 
 ```python
-# wait exists 10s
-d.xpath("//android.widget.TextView").wait(10.0)
-# find and click
-d.xpath("//*[@content-desc='分享']").click()
-# check exists
-if d.xpath("//android.widget.TextView[contains(@text, 'Se')]").exists:
-    print("exists")
-# get all text-view text, attrib and center point
-for elem in d.xpath("//android.widget.TextView").all():
-    print("Text:", elem.text)
-    # Dictionary eg: 
-    # {'index': '1', 'text': '999+', 'resource-id': 'com.netease.cloudmusic:id/qb', 'package': 'com.netease.cloudmusic', 'content-desc': '', 'checkable': 'false', 'checked': 'false', 'clickable': 'false', 'enabled': 'true', 'focusable': 'false', 'focused': 'false','scrollable': 'false', 'long-clickable': 'false', 'password': 'false', 'selected': 'false', 'visible-to-user': 'true', 'bounds': '[661,1444][718,1478]'}
-    print("Attrib:", elem.attrib)
-    # Coordinate eg: (100, 200)
-    print("Position:", elem.center())
+# grant all the permissions
+d.app_auto_grant_permissions("io.appium.android.apis")
+
+# open scheme
+d.open_url("appname://appnamehost")
+# same as
+# adb shell am start -a android.intent.action.VIEW -d "appname://appnamehost"
 ```
 
-点击查看[其他XPath常见用法](XPATH_CN.md)
+### Session (Beta)
+Session represent an app lifecycle. Can be used to start app, detect app crash.
 
-### Screenrecord (Deprecated)
-视频录制(废弃)，使用[scrcpy](https://github.com/Genymobile/scrcpy)来代替吧
+* Launch and close app
 
-这里没有使用手机中自带的screenrecord命令，是通过获取手机图片合成视频的方法，所以需要安装一些其他的依赖，如imageio, imageio-ffmpeg, numpy等
-因为有些依赖比较大，推荐使用镜像安装。直接运行下面的命令即可。
+    ```python
+    sess = d.session("com.netease.cloudmusic") # start 网易云音乐
+    sess.close() # 停止网易云音乐
+    sess.restart() # 冷启动网易云音乐
+    ```
 
-```bash
-pip3 install -U "uiautomator2[image]" -i https://pypi.doubanio.com/simple
+* Use python `with` to launch and close app
+
+    ```python
+    with d.session("com.netease.cloudmusic") as sess:
+        sess(text="Play").click()
+    ```
+
+* Attach to the running app
+
+    ```python
+    # launch app if not running, skip launch if already running
+    sess = d.session("com.netease.cloudmusic", attach=True)
+    ```
+
+* Detect app crash
+
+    ```python
+    # When app is still running
+    sess(text="Music").click() # operation goes normal
+
+    # If app crash or quit
+    sess(text="Music").click() # raise SessionBrokenError
+    # other function calls under session will raise SessionBrokenError too
+    ```
+
+    ```python
+    # check if session is ok.
+    # Warning: function name may change in the future
+    sess.running() # True or False
+    ```
+
+
+## 其他接口
+
+### 停止后台HTTP服务
+通常情况下Python程序退出了，UiAutomation就退出了。
+不过也可以通过接口的方法停止服务
+
+```python
+d.stop_uiautomator()
 ```
 
-使用方法
+### 开启调试
+打印出代码背后的HTTP请求信息
 
+```python
+>>> d.debug = True
+>>> d.info
+12:32:47.182 $ curl -X POST -d '{"jsonrpc": "2.0", "id": "b80d3a488580be1f3e9cb3e926175310", "method": "deviceInfo", "params": {}}' 'http://127.0.0.1:54179/jsonrpc/0'
+12:32:47.225 Response >>>
+{"jsonrpc":"2.0","id":"b80d3a488580be1f3e9cb3e926175310","result":{"currentPackageName":"com.android.mms","displayHeight":1920,"displayRotation":0,"displaySizeDpX":360,"displaySizeDpY":640,"displayWidth":1080,"productName"
+:"odin","screenOn":true,"sdkInt":25,"naturalOrientation":true}}
+<<< END
 ```
-d.screenrecord('output.mp4')
-
-time.sleep(10)
-# or do something else
-
-d.screenrecord.stop() # 停止录制后，output.mp4文件才能打开
-```
-
-录制的时候也可以指定fps（当前是20），这个值是率低于minicap输出图片的速度，感觉已经很好了，不建议你修改。
-
-# Enable uiautomator2 logger
 
 ```python
 from uiautomator2 import enable_pretty_logging
@@ -1404,13 +1135,51 @@ logger = logging.getLogger("uiautomator2")
 # setup logger
 ```
 
-## Stop UiAutomator
-Python程序退出了，UiAutomation就退出了。
-不过也可以通过接口的方法停止服务
+## 命令行功能
+其中的`$device_ip`代表设备的ip地址
 
-```python
-d.stop_uiautomator()
-```
+如需指定设备需要传入`--serial` 如 `python3 -m uiautomator2 --serial bff1234 <SubCommand>`, SubCommand为子命令（screenshot, current 等）
+
+> 1.0.3 Added: `python3 -m uiautomator2` equals to `uiautomator2`
+
+- screenshot: 截图
+
+    ```bash
+    $ uiautomator2 screenshot screenshot.jpg
+    ```
+
+- current: 获取当前包名和activity
+
+    ```bash
+    $ uiautomator2 current
+    {
+        "package": "com.android.browser",
+        "activity": "com.uc.browser.InnerUCMobile",
+        "pid": 28478
+    }
+    ```
+    
+- uninstall： Uninstall app
+
+    ```bash
+    $ uiautomator2 uninstall <package-name> # 卸载一个包
+    $ uiautomator2 uninstall <package-name-1> <package-name-2> # 卸载多个包
+    $ uiautomator2 uninstall --all # 全部卸载
+    ```
+
+- stop: Stop app
+
+    ```bash
+    $ uiautomator2 stop com.example.app # 停止一个app
+    $ uiautomator2 stop --all # 停止所有的app
+    ```
+
+- doctor:
+
+    ```bash
+    $ uiautomator2 doctor
+    [I 2024-04-25 19:53:36,288 __main__:101 pid:15596] uiautomator2 is OK
+    ```
 
 ## Google UiAutomator 2.0和1.x的区别
 https://www.cnblogs.com/insist8089/p/6898181.html
@@ -1429,34 +1198,21 @@ https://www.cnblogs.com/insist8089/p/6898181.html
 
 
 ## 依赖项目
-- uiautomator jsonrpc server<https://github.com/openatx/android-uiautomator-server/>
-- ~~uiautomator守护程序 <https://github.com/openatx/atx-agent>~~
+- [![PyPI](https://img.shields.io/pypi/v/adbutils.svg?label=adbutils)](https://github.com/openatx/adbutils)
+- [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/openatx/android-uiautomator-server.svg?label=android-uiautomator-server)](https://github.com/openatx/android-uiautomator-server) 已迁移到私有仓库，需要合作开发进QQ群联系群主
 
 # Contributors
-- codeskyblue ([@codeskyblue][])
-- Xiaocong He ([@xiaocong][])
-- Yuanyuan Zou ([@yuanyuan][])
-- Qian Jin ([@QianJin2013][])
-- Xu Jingjie ([@xiscoxu][])
-- Xia Mingyuan ([@mingyuan-xia][])
-- Artem Iglikov, Google Inc. ([@artikz][])
 
-[@codeskyblue]: https://github.com/codeskyblue
-[@xiaocong]: https://github.com/xiaocong
-[@yuanyuan]: https://github.com/yuanyuanzou
-[@QianJin2013]: https://github.com/QianJin2013
-[@xiscoxu]: https://github.com/xiscoxu
-[@mingyuan-xia]: https://github.com/mingyuan-xia
-[@artikz]: https://github.com/artikz
+[contributors](../../graphs/contributors)
 
-Other [contributors](../../graphs/contributors)
+# 其他优秀的项目
 
-## 其他优秀的项目
+- https://github.com/ecnusse/Kea2: 面向安卓的自动化界面遍历与脚本协同测试框架
 - https://github.com/atinfo/awesome-test-automation 所有优秀测试框架的集合，包罗万象
 - [google/mobly](https://github.com/google/mobly) 谷歌内部的测试框架，虽然我不太懂，但是感觉很好用
 - https://github.com/zhangzhao4444/Maxim 基于Uiautomator的monkey
 - http://www.sikulix.com/ 基于图像识别的自动化测试框架，非常的老牌
-- http://airtest.netease.com/ 本项目的前身，后来被网易广州团队接手并继续优化。实现有一个不错的IDE
+- http://airtest.netease.com/ 本项目的前身，后来被网易广州团队接手并继续优化。实现有一个不错的IDE (archived)
 
 排名有先后，欢迎补充
 
